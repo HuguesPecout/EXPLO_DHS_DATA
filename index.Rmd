@@ -136,7 +136,7 @@ data_ex <- read_sav("extract_spss/ZZBR62FL.SAV")
 
 ## Indicateurs disponibles
 
-**Le package R** [**rdhs**](https://docs.ropensci.org/rdhs/), développé par OJ.. Watson & J. Eaton et soutenu par [rOpenSCi](https://ropensci.org/), **permet d'accéder directement aux données avec R**. 
+**Le package R** [`rdhs`](https://docs.ropensci.org/rdhs/), développé par OJ.. Watson & J. Eaton et soutenu par [rOpenSCi](https://ropensci.org/), **permet d'accéder directement aux données avec R**. 
 
 **Ce package fournit un client pour :**    
 
@@ -151,7 +151,7 @@ data_ex <- read_sav("extract_spss/ZZBR62FL.SAV")
 
 </br>
 
-### Le package rdhs
+### Le package `rdhs`
 
 Pour récupérer à la table complète des indicateurs disponibles et à leurs caractèristiques :
 
@@ -180,7 +180,7 @@ datatable(indicators[,c(7,1)], options = list(
 
 </br>
 
-### Donnèes pour le Bénin ?
+### Indicateur pour le Bénin ?
 
 Pour récuperer les **indicateurs par enquête (date) disponibles pour le Bénin ainsi que leurs valeurs aggréger à un niveau infra-nationnal**, il suffit d'utiliser la fonction *dhs_data()* :
 
@@ -227,22 +227,27 @@ print(nrow(temp3))
 
 ```
 
-### Donnèes aggréger pour le Bénin ?
+</br>
 
-Les donnèes individuelles aggéger aux départements du Bénin sont directement mis à disposition.
+### Donnèes aggrégées  ?
 
-Exemple pour l'indicateur "Number of women age 15-49" (*FE_FRTY_W_NPG*), en 2012 : 
+**Les donnèes individuelles aggégées aux départements sont directement mis à disposition.**
+
+Exemple pour l'indicateur "	Total fertility rate 15-49" (*FE_FRTR_W_TFR*), en 2012 : 
 
 ```{r,  eval= TRUE}
 
-resp2 <- dhs_data(indicatorIds = "FE_FRTY_W_NPG", 
+resp2 <- dhs_data(indicatorIds = "FE_FRTR_W_TFR", 
                  surveyYearStart = 2012, 
                  surveyYearEnd = 2012,
                  breakdown = "subnational", 
                  countryIds = "BJ")
 
 
-unique(resp2$CharacteristicLabel)
+datatable(resp2[, c("CharacteristicLabel", "Value")], 
+          options = list(autoWidth = TRUE, 
+                         rownames = FALSE,
+                         pageLength = 18))
 
 
 ```
@@ -252,33 +257,56 @@ Le données sont également aggrégées par couple de département.
 <div class="alert alert-danger" role="alert">
 **Il n'y a malheureusement pas de clef de jointure fournies dans ces extraction les relier facilement à une couche géographique...**
 
-**Un table de correspondance est mis à disposition à ce** [**lien**]()
-</div>
+**Une table de correspondance est mis à disposition à ce** [**lien**](https://github.com/HuguesPecout/EXPLO_DHS_DATA/raw/main/table_passage_nom_ISO_Dep_Benin)</div>
+
+Pour récupérer les géométries du découpage administratif du Bénin directement depuis R, il est possible d'utiliser le package `gadmr`
 
 
+```{r,  eval= TRUE}
+
+if(!require(remotes)) install.packages("remotes")
+if(!require(gadmr)) remotes::install_github("SpatialWorks/gadmr")
+
+library(gadmr)
+# Téléchargement 
+benin_sp <- get_geopackage(country = "BEN",  layer = 1)
+
+# Convesrion objet sp to sf
+library(sf)
+benin_sf <- st_as_sf(benin_sp)
+
+# Affichage de la couche
+plot(st_geometry(benin_sf))
+```
+
+```{r,  eval= TRUE}
+
+# Chargement table de correspondance (à télécharger)
+table <- readRDS("table_passage_nom_ISO_Dep_Benin")
+
+# Merge avec la table de correspondance
+benin_sf <- merge(benin_sf, table, by.x="HASC_1", by.y="ISO" )
+
+# Merge avec les données
+benin_sf <- merge(benin_sf, resp2, by.x="NAME_dhs", by.y="CharacteristicLabel" )
+
+# Cartography
+library(mapsf)
+mf_map(benin_sf, var = "Value", type = "choro")
+
+```
+
+
+# Donnée individuelles
 
 [Guide to DHS Statistics](https://dhsprogram.com/Data/Guide-to-DHS-Statistics/index.cfm)
 
-### Package rdhs
+## S'enregistrer ?
 
-### Liste des indicateurs
-
-### Date d'enquête
-
-# Accès aux données
-
-## Example datasets
-
-## Inscription
+## Extraire des données
 
 
-# Donnèes individuelles
-
-
-## Présentation
-
-
-## Partie A.4
+# Exploration
 
 
 
