@@ -89,7 +89,7 @@ Il semblerait que **la localisation GPS des individus enquêtés ne soit pas dis
 
 </br>
 
-# Accès aux données
+# Les donnèes
 
 L'accées aux données est gratuite, mais **il est obligatoire de** [**réaliser une demande justifiée**](https://dhsprogram.com/data/new-user-registration.cfm) **pour avoir d'un compte utilisateur permettant le téléchargement des données individuelles**.
 
@@ -180,7 +180,7 @@ datatable(indicators[,c(7,1)], options = list(
 
 </br>
 
-### Indicateur pour le Bénin ?
+### Indicateurs pour le Bénin ?
 
 Pour récuperer les **indicateurs par enquête (date) disponibles pour le Bénin ainsi que leurs valeurs aggréger à un niveau infra-nationnal**, il suffit d'utiliser la fonction *dhs_data()* :
 
@@ -229,7 +229,7 @@ print(nrow(temp3))
 
 </br>
 
-### Donnèes aggrégées  ?
+### Donnèes aggrégées pour le Bénin ?
 
 **Les donnèes individuelles aggégées aux départements sont directement mis à disposition.**
 
@@ -271,15 +271,9 @@ library(gadmr)
 # Téléchargement 
 benin_sp <- get_geopackage(country = "BEN",  layer = 1)
 
-# Convesrion objet sp to sf
+# Conversion objet sp to sf
 library(sf)
 benin_sf <- st_as_sf(benin_sp)
-
-# Affichage de la couche
-plot(st_geometry(benin_sf))
-```
-
-```{r,  eval= TRUE}
 
 # Chargement table de correspondance (à télécharger)
 table <- readRDS("table_passage_nom_ISO_Dep_Benin")
@@ -293,7 +287,6 @@ benin_sf <- merge(benin_sf, resp2, by.x="NAME_dhs", by.y="CharacteristicLabel" )
 # Cartography
 library(mapsf)
 mf_map(benin_sf, var = "Value", type = "choro")
-
 ```
 
 
