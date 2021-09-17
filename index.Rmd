@@ -6,7 +6,7 @@ author:
  - name: Hugues Pecout
    affiliation: CNRS, FR CIST
 image: "featured.jpg"   
-logo: "figures/transparent.png"  
+logo: "figures/usaid.png"  
 output:
   rzine::readrzine:
     highlight: kate
@@ -55,46 +55,27 @@ knitr::include_graphics("figures/carte_DHS.png")
 
 </br>
 
-## Couverture du Bénin
 
-Le Bénin fait partie des [pays ciblés par les enquêtes](https://dhsprogram.com/Countries/). Dans le cadre de ce programme, [**l'enquête standard DHS a été réalisées 5 fois**](https://dhsprogram.com/methodology/survey-search.cfm?sendsearch=1&str1=52&crt=1&listgrp=3) sur ce pays, aux dates suivantes : **1996**, **2001**, **2006**, **2011-2012**, **2017-2018**.
-
-Voici un aperçu de **quelques indicateurs collectés** (valeur nationnale) et leur **disponibilité par dates** :
-
-```{r,  echo=FALSE}
-
-library(xlsx)
-Benin_indicator <- read.xlsx(file = "figures/STATcompilerExport2021916_1595.xlsx", 
-                             sheetIndex = 1,
-                             startRow = 4,
-                             endRow = 34)
-
-Benin_indicator <- Benin_indicator[, c(1,  8:4)]
-colnames(Benin_indicator) <- c("Indicator",
-                               "1996",
-                               "2001",
-                               "2006",
-                               "2011-2012",
-                               "2017-2018")
-
-library(DT)
-datatable(Benin_indicator, options = list(
-                                        autoWidth = TRUE, 
-                                        rownames = FALSE,
-                                        pageLength =NULL))
-```
-
-<div class="alert alert-danger" role="alert">
-Il semblerait que **la localisation GPS des individus enquêtés ne soit pas disponible pour 2006**.</div>
-
-</br>
 
 # Les donnèes
 
 L'accées aux données est gratuite, mais **il est obligatoire de** [**réaliser une demande justifiée**](https://dhsprogram.com/data/new-user-registration.cfm) **pour avoir d'un compte utilisateur permettant le téléchargement des données individuelles**.
 
 <div class="alert alert-danger" role="alert">
-**Seules des données aggrégés à des niveaux régionaux (départements pour le Bénin) sont accessibles sans création de compte** [**(cf partie 1.2)**](#indicateurs-disponibles).</div>
+**Seules des données aggrégés à des niveaux régionaux (départements pour le Bénin), et un jeu de données individuelles modèle (exemple) sont accessibles sans création de compte** [**(cf partie 1.2)**](#indicateurs-disponibles).</div>
+
+</br>
+
+## Questionnaire DHS
+
+Beaucoup de documentation sur les méthodes d'enquête et les donnèes est mis à disposition : 
+
+
+1) [**Guide to DHS Statistics** V7](https://dhsprogram.com/Data/Guide-to-DHS-Statistics/index.cfm)    
+2) [**Modèle de questionnaire** V6](https://www.dhsprogram.com/publications/publication-dhsq6-dhs-questionnaires-and-manuals.cfm)    
+3) [**Information sur les donnèes** V6](https://www.dhsprogram.com/publications/publication-dhsg4-dhs-questionnaires-and-manuals.cfm)   
+
+</br>
 
 ## Jeu de données exemple
 
@@ -125,12 +106,92 @@ Les données sont proposées aux téléchargement par groupes d'individus ou th�
 - HIV Test results   
 
 
-```{r,  eval= FALSE, echo=FALSE}
+
+<div class="alert alert-danger" role="alert">
+**La localisation GPS des individus ne semble pas être fournie dans le jeu de donnèes exemple...**</div>
+
+</br>
+
+### Import des données exemple
+
+**-> Test d'import des donnèes "household" au format SPSS (.sav) :**
+
+```{r,  eval= TRUE, echo=TRUE, cache=TRUE}
 
 library(haven)
-data_ex <- read_sav("extract_spss/ZZBR62FL.SAV")
+data_ex <- read_sav("model/zzhr62sv/ZZHR62FL.SAV")
 
 ```
+
+</br>
+
+### Liste des variables (avec label)
+
+```{r,  eval= TRUE, echo=TRUE, cache=TRUE}
+
+# AFFICHER LE LABEL D'UNE VARIABLE
+attr(data_ex$HV028, "label")
+
+# AFFICHER LES LABELS DE TOUTES LES VARIABLES (Code + label)
+l <- lapply(data_ex, attr, "label")
+l <- as.data.frame(l, stringsAsFactors = F)
+list_var <- as.data.frame(t(l))
+
+library(DT)
+datatable(list_var, options = list(
+                                        autoWidth = TRUE, 
+                                        rownames = FALSE,
+                                        pageLength =NULL))
+
+```
+
+</br>
+
+### Liste des modalités (avec label)
+
+```{r,  eval= TRUE, echo=TRUE, cache=TRUE}
+# POUR UNE SEULE VARIABLE
+attr(data_ex[["HV023"]], "labels")
+
+# POUR TOUTES LES VARIABLES
+library(sjlabelled)
+get_labels(data_ex)
+
+```
+
+</br>
+
+## Couverture du Bénin
+
+Le Bénin fait partie des [pays ciblés par les enquêtes](https://dhsprogram.com/Countries/). Dans le cadre de ce programme, [**l'enquête standard DHS a été réalisées 5 fois**](https://dhsprogram.com/methodology/survey-search.cfm?sendsearch=1&str1=52&crt=1&listgrp=3) sur ce pays, aux dates suivantes : **1996**, **2001**, **2006**, **2011-2012**, **2017-2018**.
+
+Voici un aperçu de **quelques indicateurs collectés** (valeur nationnale) et leur **disponibilité par dates** :
+
+```{r,  echo=FALSE, cache=TRUE}
+
+library(xlsx)
+Benin_indicator <- read.xlsx(file = "figures/STATcompilerExport2021916_1595.xlsx", 
+                             sheetIndex = 1,
+                             startRow = 4,
+                             endRow = 34)
+
+Benin_indicator <- Benin_indicator[, c(1,  8:4)]
+colnames(Benin_indicator) <- c("Indicator",
+                               "1996",
+                               "2001",
+                               "2006",
+                               "2011-2012",
+                               "2017-2018")
+
+
+datatable(Benin_indicator, options = list(
+                                        autoWidth = TRUE, 
+                                        rownames = FALSE,
+                                        pageLength =NULL))
+```
+
+<div class="alert alert-danger" role="alert">
+Il semblerait que **la localisation GPS des individus enquêtés ne soit pas disponible pour 2006**.</div>
 
 </br>
 
@@ -151,11 +212,12 @@ data_ex <- read_sav("extract_spss/ZZBR62FL.SAV")
 
 </br>
 
-### Le package `rdhs`
+
+## Le package `rdhs`
 
 Pour récupérer à la table complète des indicateurs disponibles et à leurs caractèristiques :
 
-```{r,  eval= TRUE}
+```{r,  eval= TRUE, cache=TRUE}
 
 # install.packages("rdhs")  
 library(rdhs)
@@ -167,7 +229,7 @@ indicators <- dhs_indicators()
 
 **Ci dessous, la liste des indicateurs (ID + définition) :**    
 
-```{r,  eval= TRUE, echo=FALSE}
+```{r,  eval= TRUE, echo=FALSE, cache=TRUE}
 
 
 datatable(indicators[,c(7,1)], options = list(
@@ -184,7 +246,7 @@ datatable(indicators[,c(7,1)], options = list(
 
 Pour récuperer les **indicateurs par enquête (date) disponibles pour le Bénin ainsi que leurs valeurs aggréger à un niveau infra-nationnal**, il suffit d'utiliser la fonction *dhs_data()* :
 
-```{r,  eval= TRUE}
+```{r,  eval= TRUE, cache=TRUE}
 
 # Make an api request
 resp <- dhs_data(surveyYearStart = 1990,
@@ -197,7 +259,7 @@ str(resp)
 
 **Nombre d'indicateurs disponibles par enquête pour le Bénin :**
 
-```{r,  eval= TRUE}
+```{r,  eval= TRUE, cache=TRUE}
 
 # Group by Survey and indicator
 temp <- aggregate(data = resp, Indicator ~ SurveyYearLabel + IndicatorId + IndicatorType, length)
@@ -216,7 +278,7 @@ ggplot(temp2, aes(x = Year_of_survey, y = Number_of_indicators_available,
 
 **Nombre d'indicateurs disponibles à chaque date pour le Bénin (depuis 1996) :**
 
-```{r,  eval= TRUE}
+```{r,  eval= TRUE, cache=TRUE}
 
 
 temp3 <- aggregate(data = temp, SurveyYearLabel ~ IndicatorId, length)
@@ -233,9 +295,9 @@ print(nrow(temp3))
 
 **Les donnèes individuelles aggégées aux départements sont directement mis à disposition.**
 
-Exemple pour l'indicateur "	Total fertility rate 15-49" (*FE_FRTR_W_TFR*), en 2012 : 
+Exemple pour l'indicateur "Total fertility rate 15-49" (*FE_FRTR_W_TFR*), en 2012 : 
 
-```{r,  eval= TRUE}
+```{r,  eval= TRUE, cache=TRUE}
 
 resp2 <- dhs_data(indicatorIds = "FE_FRTR_W_TFR", 
                  surveyYearStart = 2012, 
@@ -262,7 +324,7 @@ Le données sont également aggrégées par couple de département.
 Pour récupérer les géométries du découpage administratif du Bénin directement depuis R, il est possible d'utiliser le package `gadmr`
 
 
-```{r,  eval= TRUE}
+```{r,  eval= TRUE, cache=TRUE}
 
 if(!require(remotes)) install.packages("remotes")
 if(!require(gadmr)) remotes::install_github("SpatialWorks/gadmr")
@@ -286,20 +348,31 @@ benin_sf <- merge(benin_sf, resp2, by.x="NAME_dhs", by.y="CharacteristicLabel" )
 
 # Cartography
 library(mapsf)
-mf_map(benin_sf, var = "Value", type = "choro")
+mf_theme("agolalight")
+mf_map(benin_sf, var = "Value", type = "choro", leg_pos = "left")
+mf_layout(title = "Total fertility rate 15-49, 2012",
+          credits = "DHS program, 2012",
+          scale = FALSE,
+          arrow = TRUE,
+          frame = TRUE)
+mf_inset_on(x = "worldmap")
+mf_worldmap(benin_sf)
+mf_inset_off()
+
+
 ```
+
+</br>
 
 
 # Donnée individuelles
 
-[Guide to DHS Statistics](https://dhsprogram.com/Data/Guide-to-DHS-Statistics/index.cfm)
+## S'enregistrer
 
-## S'enregistrer ?
-
-## Extraire des données
+## Exploration des donnèes
 
 
-# Exploration
+
 
 
 
@@ -321,19 +394,12 @@ mf_map(benin_sf, var = "Value", type = "choro")
 ```{r session_info, echo=FALSE}
 kableExtra::kable_styling(kable(sessionRzine()[[1]], row.names = F))
 kableExtra::kable_styling(kable(sessionRzine()[[2]], row.names = F))
+
+
 ```
 
 
 
 <br>
 
-## Glossaire {- #endnotes}
 
-```{js, echo=FALSE}
-
-$(document).ready(function() {
-  $('.footnotes ol').appendTo('#endnotes');
-  $('.footnotes').remove();
-});
-
-```
