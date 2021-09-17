@@ -1,0 +1,14 @@
+base
+knitr
+rmarkdown
+rzine
+haven
+DT
+sjlabelled
+xlsx
+rdhs
+ggplot2
+remotes
+gadmr
+sf
+mapsf
