@@ -9,6 +9,7 @@ image: "featured.jpg"
 logo: "figures/usaid.png"  
 output:
   rzine::readrzine:
+    toc_depth: 3
     highlight: kate
     number_sections: true
 csl: Rzine_citation.csl
@@ -49,7 +50,7 @@ Le [programme DHS](https://www.dhsprogram.com/) est un programme d'enquêtes dé
 
 **Ce programme a collecté, analysé et diffuse des données précises et représentatives sur la population, la santé, le VIH et la nutrition à travers plus de 400 enquêtes dans plus de 90 pays, depuis plus de 30 ans :**
 
-```{r,  echo=FALSE, out.width="100%",  fig.align = 'center'}
+```{r,  echo=FALSE, out.width="100%",  fig.align = 'center', fig.cap='https://dhsprogram.com/Countries/index.cfm?show=map#activeType=_all&printStyle=false&mLon=12.8&mLat=11.7&mLev=2&title=Where%20We%20Work&desc='}
 knitr::include_graphics("figures/carte_DHS.png")
 ```
 
@@ -215,6 +216,22 @@ Il semblerait que **la localisation GPS des individus enquêtés ne soit pas dis
 
 ## Le package `rdhs`
 
+**Ce package permet d'importer/requêter les données DHS directement avec R (API)**.
+**Quelques ressources sur ce package :**   
+
+- [CRAN - Aide officielle](https://cran.r-project.org/web/packages/rdhs/rdhs.pdf) 
+- [Vignette - Anemia prevalence among women: an 'rdhs' example](https://cran.r-project.org/web/packages/rdhs/vignettes/anemia.html)  
+- [Vignette - Downloading shape files for DHS surveys'= example](https://cran.r-project.org/web/packages/rdhs/vignettes/boundaries.html)     
+- [Vignette - Using the rdhs client example](https://cran.r-project.org/web/packages/rdhs/vignettes/client.html)     
+- [Vignette - Country Codes example](https://cran.r-project.org/web/packages/rdhs/vignettes/country_codes.html)     
+- [Vignette - Interacting with geojson API results example](https://cran.r-project.org/web/packages/rdhs/vignettes/geojson.html)     
+- [Vignette - https://cran.r-project.org/web/packages/rdhs/vignettes/testing.html example](https://cran.r-project.org/web/packages/rdhs/vignettes/testing.html)     
+
+- [rdhs: an R package to interact with The Demographic and Health Surveys (DHS) Program datasets](https://www.researchgate.net/publication/334073531_rdhs_an_R_package_to_interact_with_The_Demographic_and_Health_Surveys_DHS_Program_datasets)     
+- [rOpenSci - Interacting with The Demographic and Health Surveys (DHS) Program data](https://ropensci.org/blog/2019/01/29/rdhs/)     
+- [asdfree.com](http://asdfree.com/demographic-and-health-surveys-dhs.html)      
+- [rspatialdata](https://rspatialdata.github.io/dhs-data.html)      
+
 Pour récupérer à la table complète des indicateurs disponibles et à leurs caractèristiques :
 
 ```{r,  eval= TRUE, cache=TRUE}
@@ -369,15 +386,238 @@ mf_inset_off()
 
 ## S'enregistrer
 
-## Exploration des donnèes
+Il est nécéssaire de faire une demande justifiée pour accéder aux données, en remplissant ce formulaire : [https://dhsprogram.com/data/new-user-registration.cfm](https://dhsprogram.com/data/new-user-registration.cfm).
+
+<div class="alert alert-danger" role="alert">
+**La  demande doit être précise (pays, thématique/analyse ciblé et pourquoi ?)**. **Les données ne peuvent être partagées**. Nous devons également les prevenir en cas de publication avec ces données.</div>
+
+
+**Je donc fais une demande d'accèes à l'intégralité des données sur le Benin, coordonnées GPS incluses**. Ma demande, refusée dans un premier temps car pas assez précise à finalement été acceptée. Il m'ont demandé de m'engager par écrit que chaque participant/enseignant de l'école devra faire une demande d'accèes personnelle, même si la demande est identique pour tout le monde. **L'accèes à ces données a également été donné à Claude (claude.grasland@parisgeo.cnrs.fr)**.
+
+
+## Accès aux données depuis le site
+
+Nous pouvons récupérer les données en nous connectant sur cette [page](https://dhsprogram.com/data/dataset_admin/login_main.cfm?CFID=32453372&CFTOKEN=32609e957fb82381-24A0A2D0-BF76-4ACC-2E20E233ED8A9345).
+
+L'extraction est nommée "**Summer Shcool on Spatial analysis**" :
+
+```{r,  echo=FALSE, out.width="100%",  fig.align = 'center'}
+knitr::include_graphics("figures/download_data.png")
+```
 
 
 
+```{r,  echo=FALSE, out.width="100%",  fig.align = 'center'}
+knitr::include_graphics("figures/download_data2.png")
+```
+
+**Huit fichiers sont mis à disposition** (pour chaque enquête/date) :
+
+- **Birth**     
+- **Couples**         
+- **Fieldeworker questionnaire**       
+- **Household**     
+- **Individual**     
+- **Children**     
+- **Men**     
+- **Household member**     
+
+Des **fichiers de données géographiques** sont également téléchargeables :
+
+```{r,  echo=FALSE, out.width="100%",  fig.align = 'center'}
+knitr::include_graphics("figures/download_data3.png")
+```
 
 
 
+## Accès aux données avec `rdhs`
 
 
+
+Les package `rdhs` permet de télécharger directement les donnèes mises à disposition via R.
+
+```{r,  eval= TRUE, cache=FALSE}
+
+# if(!require(remotes)) install.packages("rdhs")
+
+library(rdhs)
+
+```
+
+
+   
+
+```{r DATA_OK,  eval=FALSE, echo= FALSE, cache=TRUE}
+
+library(rdhs)
+config <- set_rdhs_config(email = "hugues.pecout@cnrs.fr",
+                project = "Summer School on Spatial analysis",
+                config_path = "~/.rdhs.json",
+                global = TRUE,
+                verbose_download = TRUE)
+
+
+
+```
+
+### Informations d'identification
+
+```{r,  eval=FALSE, cache=TRUE}
+
+config <- set_rdhs_config(email = "hugues.pecout@cnrs.fr",
+                project = "Summer School on Spatial analysis",
+                config_path = "~/.rdhs.json",
+                global = TRUE,
+                verbose_download = TRUE)
+
+```
+
+Répondre à la question par **1** ou **2** (puis "Entrée") dans la console :
+
+```{r,  echo=FALSE, out.width="65%",  fig.align = 'center'}
+knitr::include_graphics("figures/question_cache.png")
+```
+
+Une fenêtre pop-up s'ouvre pour **saisir le mot de passe** :
+
+```{r,  echo=FALSE, out.width="45%",  fig.align = 'center'}
+knitr::include_graphics("figures/pw.png")
+```
+
+
+### Créer le 'coté client' 
+
+Créer le 'coté client' de l'API qui pourra être appelé comme argument dans différentes fonctions du package** avec `client_dhs`. Cela crée un cache pour toutes les datasets téléchargés.
+
+
+```{r,  eval=TRUE, echo=FALSE, cache=FALSE}
+
+configuration <- get_rdhs_config()
+
+```
+
+```{r,  eval=TRUE, cache=FALSE}
+
+client <- client_dhs(configuration)
+
+```
+
+### Lister les datasets
+
+La liste (et le nom de fichiers) des datasets accessibles est consultable depuis votre compte  sur [dhsprogram.com](https://dhsprogram.com/). Exemple :
+
+```{r,  echo=FALSE, out.width="90%",  fig.align = 'center'}
+knitr::include_graphics("figures/sav.png")
+```
+
+Mais, **il est également possible de lister tous les datasets (avec leur nom de code)** de la manière suivante avec la fonction `dhs_datasets`
+
+```{r,  eval= TRUE, echo=TRUE, cache=TRUE}
+
+library(rdhs)
+
+# Séléction de l'ensemble des datasets sur le Bénin
+dat <- dhs_datasets(countryIds="BJ")
+
+```
+
+Cela génére un tableau  dans lequel l'on peut repérer le nom des fichiers (***FilName***). Extrait :
+
+```{r,  eval= TRUE, echo= FALSE, cache=TRUE}
+
+library(DT)
+datatable(dat[,c(3,1,6,9,12)], options = list(autoWidth = TRUE, 
+                              rownames = FALSE,
+                              pageLength =NULL))
+
+``` 
+
+### Télécharger un dataset 
+
+
+Pour télécharger un jeu de données, utiliser `get_datasets()`.
+
+Exemple avec le dataset "***Individual Recode***" de **2027-2018** en **format SPSS** (.sav) :
+
+```{r,  eval= TRUE, echo= TRUE, cache=TRUE}
+
+# Ecrire le nom du fichier ciblé
+# Ou le numéro de ligne, ex : get_datasets(dat$FileName[167])
+DHS_BJ_data17 <- get_datasets("BJIR71SV.ZIP")
+
+
+```
+
+Pareil le **dataset comportant les localisations GPS** en **2017-2018** en **format Flat ASCII ** (.dat) :
+
+```{r,  eval= TRUE, echo= TRUE, cache=TRUE}
+
+DHS_BJ_Geo17 <- get_datasets("BJGE71FL.ZIP")
+
+```
+
+Les donnèes sont alors téléchargées dans un fichier temporaire sur sa machine. Il ne reste plus qu'à les charger dans R.
+
+### Importer un dataset dans R
+
+Utiliser la fonction `readRDS()`
+
+```{r,  eval= TRUE, echo= TRUE, cache=TRUE}
+
+# Données d'enquête prétéléchargées
+Data_BJ17 <- readRDS(DHS_BJ_data17$BJIR71SV)
+
+# Données géographiques prétéléchargées
+Geo_BJ17 <- readRDS(DHS_BJ_Geo17$BJGE71FL)
+
+```
+
+
+### Visualiser les coordonnées GPS
+
+**Les données géographiques sont en format sp : Conversion en sf !**
+
+```{r,  eval= TRUE, echo= TRUE, cache=TRUE}
+
+library(sf)
+Geo_BJ17 <- st_as_sf(x = Geo_BJ17)
+
+```
+
+**Visualisation des données géographiques :**
+
+```{r,  eval=FALSE, echo=FALSE, cache=TRUE}
+
+
+library(leaflet)
+leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addMarkers(lng= Geo_BJ17$LONGNUM , lat=Geo_BJ17$LATNUM, popup=Geo_BJ17$DHSID)
+
+# library(mapview)
+# mapview(Geo_BJ17)
+
+
+```
+
+
+</br>
+</br>
+</br>
+</br>
+</br>
+</br>
+
+
+DHS recode -> https://dhsprogram.com/publications/publication-dhsg4-dhs-questionnaires-and-manuals.cfm
+
+Documentation sur le traitement spatial des données :   
+- https://dhsprogram.com/pubs/pdf/SAR11/SAR11.pdf  
+
+Documentation sur prevR package :     
+- https://cran.r-project.org/web/packages/prevR/index.html    
+- https://journals.openedition.org/cybergeo/24606   
+- https://cran.r-project.org/web/packages/prevR/vignettes/intro_prevR.html   
 
 
 
