@@ -112,7 +112,7 @@ Les données sont proposées aux téléchargement par groupes d'individus ou th�
 
 </br>
 
-### Import des données exemple
+### Import des données exemples
 
 **-> Test d'import des donnèes "household" au format SPSS (.sav) :**
 
@@ -381,7 +381,7 @@ mf_inset_off()
 </br>
 
 
-# Donnée individuelles
+# Données individuelles
 
 ## S'enregistrer
 
@@ -622,7 +622,7 @@ Documentation sur prevR package :
 # Annexes {-}
 
 
-## Infos session  {-}
+## Info session  {-}
 
 ```{r session_info, echo=FALSE}
 kableExtra::kable_styling(kable(sessionRzine()[[1]], row.names = F))
