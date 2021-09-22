@@ -43,7 +43,6 @@ opts_chunk$set(echo=TRUE,
 ```
 
 
-
 # The DHS Program {-}
 
 Le [programme DHS](https://www.dhsprogram.com/) est un programme d'enquêtes démographiques et de santé (EDS) de l'[United States Agency for International Development](https://www.usaid.gov/).
@@ -586,16 +585,10 @@ Geo_BJ17 <- st_as_sf(x = Geo_BJ17)
 
 **Visualisation des données géographiques :**
 
-```{r,  eval=FALSE, echo=FALSE, cache=TRUE}
+```{r,  eval=TRUE, echo=TRUE, cache=FALSE}
 
-
-library(leaflet)
-leaflet() %>%
-  addTiles() %>%  # Add default OpenStreetMap map tiles
-  addMarkers(lng= Geo_BJ17$LONGNUM , lat=Geo_BJ17$LATNUM, popup=Geo_BJ17$DHSID)
-
-# library(mapview)
-# mapview(Geo_BJ17)
+library(mapview)
+mapview(Geo_BJ17)
 
 
 ```
